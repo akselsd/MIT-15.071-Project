@@ -23,5 +23,5 @@
 - ```git log``` to see the commit history
 
 ### General tips
-- Git has a steep learning curve, so it is likely that you will get stuck/break something. Don't be afraid to Google for help, but if you can't resolve it on your own and don't want to wait for me to help, you could always make a new folder and use ```git clone``` again to get a fresh start.
+- Git has a steep learning curve, so it is likely that you will get stuck/break something. Don't be afraid to Google for help, but if you can't resolve it on your own and don't want to wait for me to help, you could always make a new folder and use ```git clone https://github.com/akselsd/MIT-15.071-Project.git``` again to get a fresh start.
 - The only dangerous thing is to use a command with ```--force``` as this will override a lot of the built in safety mechanisms in Git. Only use this flag if you know what you are doing.
