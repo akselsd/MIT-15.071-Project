@@ -1,7 +1,4 @@
 Analytics Edge
-<<<<<<< HEAD
 
 Hello world 
-=======
 Aksel
->>>>>>> Added name to demo.txt
