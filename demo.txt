@@ -1,3 +1,7 @@
 Analytics Edge
 
+<<<<<<< HEAD
 Hello world 
+=======
+Adding Phil's code here!
+>>>>>>> Phil's text
