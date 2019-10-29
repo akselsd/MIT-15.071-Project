@@ -35,8 +35,6 @@ vignettes/*.pdf
 # Shiny token, see https://shiny.rstudio.com/articles/shinyapps.html
 rsconnect/
 
-*.csv
-
 # General
 .DS_Store
 .AppleDouble
