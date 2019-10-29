@@ -1,3 +1,8 @@
+# Incase we want to redo data extraction from main data set
+# reads csv based on year input and outputs filtered csv
+# can be modified for city and other filters
+#
+#
 clean_data <- function(year) {
   infile = paste(toString(year), ".csv", sep="")
   data = read.csv(infile)
