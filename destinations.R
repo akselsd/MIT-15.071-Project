@@ -56,7 +56,7 @@ plot = ggplot(avg.arr.delay, aes(x=Group.1, x))+
   ylab("Average arrival delay in 2018") +
   labs(title = "Arrival delay of flights comming out of Boston in 2018")
 
-ggsave("Plots/departure_delay_outgoing_2018.pdf")
+ggsave("Plots/arrival_delay_outgoing_2018.pdf")
 
 
 
