@@ -1,5 +1,6 @@
 source("load_data.R")
 library(ggplot2)
+library(reshape2)
 library(tidyverse)
 
 ## === Barplot for destination distibution ===
@@ -58,9 +59,23 @@ plot = ggplot(avg.arr.delay, aes(x=Group.1, x))+
 
 ggsave("Plots/arrival_delay_outgoing_2018.pdf")
 
+df = data.frame(
+  dep = avg.dest.delay$x,
+  arr = avg.arr.delay$x,
+  airport = avg.arr.delay$Group.1
+)
+
+df.long = melt(df, id.vars="airport")
+
+plot = ggplot(df.long, aes(x=airport, y=value, fill=factor(variable)))+
+  geom_bar(stat="identity",position="dodge")+
+  xlab("Airport")+ylab("Average delay")+
+  theme(axis.text.x = element_text(angle = 90, size = 6)) +
+  theme(axis.ticks.x = element_blank())+
+  scale_fill_discrete(name="Delay type", labels=c("Departure", "Arrival"))+
+  labs(title = "Delay of outgoing flights in 2018")
 
 
-
-
+ggsave("Plots/delay_outgoing_2018.pdf")
 
 
