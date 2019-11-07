@@ -8,15 +8,17 @@
 # Needs package testit, to install run install.packages("testit")
 #
 library(testit)
+source("utils.R")
 
 load_data <- function(startyear, endyear) {
-  df = load_data_w_cancelled(startyear, endyear)
+  df = load_data_cancelled(startyear, endyear)
   df = df[df$CANCELLED == 0,]
   
   assert("No NA in arrival delay column", nrow(df[is.na(df$ARR_DELAY),]) == 0)
   assert("No NA in departure delay column", nrow(df[is.na(df$DEP_DELAY),]) == 0)
   assert("No cancelled flights", nrow(df[df$CANCELLED == 1,]) == 0)
   assert("No diverted flights", nrow(df[df$DIVERTED == 1,]) == 0)
+  
   
   
   return(df)
@@ -35,6 +37,8 @@ load_data_cancelled <- function(startyear, endyear) {
   
   df$ARR_DELAY[df$ARR_TIME == df$CRS_ARR_TIME] <- 0
   df$DEP_DELAY[df$DEP_TIME == df$CRS_DEP_TIME] <- 0
+  
+  df = add_timeofday_column(df)
   
   return(df)
 }
