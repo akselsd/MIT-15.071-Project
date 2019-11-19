@@ -24,6 +24,10 @@ load_data <- function(startyear, endyear) {
   return(df)
 }
 
+
+#the function below includes cancelled flights in the data set and zeros them instead of NA
+#and is used in the main function load_data
+
 load_data_cancelled <- function(startyear, endyear) {
   df = data.frame()
   
