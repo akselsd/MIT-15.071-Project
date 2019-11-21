@@ -5,37 +5,36 @@ library(ggplot2)
 library(tidyverse)
 
 ## === Delay types ===
-flight18 = load_data(2018, 2018)
+flight = load_data(2018, 2018)
 
-#Only flights originating in Boston '18
-BOS18 = subset(flight18, ORIGIN == "BOS")
+#Only flights originating in Boston
+BOS = subset(flight, ORIGIN == "BOS")
 
 #Add Weekday column
-BOS18$Weekday = weekdays(as.Date(BOS18$FL_DATE,'%Y-%m-%d'))
+BOS$Weekday = weekdays(as.Date(BOS$FL_DATE,'%Y-%m-%d'))
 
 #Flights by weekday
-table(BOS18$Weekday)
+table(BOS$Weekday)
 
-avg.weekday.delay = aggregate(BOS18$DEP_DELAY, by=list(BOS18$Weekday), FUN=mean)
+avg.weekday.delay = aggregate(BOS$ARR_DELAY, by=list(BOS$Weekday), FUN=mean)
 avg.weekday.delay
 
-plot(BOS18$Weekday, avg.weekday.delay)
-plot(BOS18$Weekday, BOS18$DEP_DELAY, xlab = "Weekday", ylab = "Delay Time")
+days = list(BOS$Weekday)
+days
 
+plot(BOS$Weekday, avg.weekday.delay)
+plot(BOS$Weekday, BOS$ARR_DELAY, xlab = "Weekday", ylab = "Delay Time")
 
 #Delay by Carrier
-DelayByCarrier = aggregate(BOS18$DEP_DELAY, by=list(BOS18$OP_CARRIER), FUN=mean)
+DelayByCarrier = aggregate(BOS$ARR_DELAY, by=list(BOS$OP_CARRIER), FUN=mean)
 DelayByCarrier
 
-plot(BOS18$OP_CARRIER, DelayByCarrier)
-plot(BOS18$OP_CARRIER, BOS18$DEP_DELAY, xlab = "Weekday", ylab = "Delay Time")
-
+plot(BOS$OP_CARRIER, DelayByCarrier)
+plot(BOS$OP_CARRIER, DelayByCarrier, xlab = "Carrier", ylab = "Delay Time")
 
 #Canceled flights
 BOS_cancelled = subset(flight18, CANCELLED == 1)
 BOS_blank = BOS18[is.na(FL_DATE)]
-
-
 
 nrow(BOS18$DIVERTED == 1)
 
