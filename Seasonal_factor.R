@@ -1,21 +1,22 @@
 #will create a separate dataframe with seasons (spring,summer,fall,winter)
-#junejulyaug == summer
+#julyaugseptember == summer
 #septoctnov == fall
-#decjanfeb == winter
-#marchaprilmay == spring
+#janfebmarch == winter
+#aprilmayjune == spring
 
 plot(train_2018$FL_DATE,train_2018$DEP_DELAY)
 
 
 
 seasonal_data <- function(df)
-input$season = 1
-date <- as.Date(train_2018$FL_DATE)
+{
+date <- as.Date(df$FL_DATE)
 df$monthnum = as.numeric(as.factor(months(date)))
 
-df$season = "summer"
 df$season = cut(df$monthnum,c(1,4,8,12))
 levels(df$season) = c("winter","spring","summer","fall")
+return(df)
+}
 # 
 #                             
 #   for (i in df$monthnum) {
@@ -29,6 +30,6 @@ levels(df$season) = c("winter","spring","summer","fall")
 # }
 
 
-flight_Bos_2018$time_of_day="TBD"
-flight_Bos_2018$time_of_day=cut(flight_Bos_2018$CRS_DEP_TIME,c(0,600,1200,1800,2400))
-levels(flight_Bos_2018$time_of_day) = c("night","morning","afternoon","evening")
+# flight_Bos_2018$time_of_day="TBD"
+# flight_Bos_2018$time_of_day=cut(flight_Bos_2018$CRS_DEP_TIME,c(0,600,1200,1800,2400))
+# levels(flight_Bos_2018$time_of_day) = c("night","morning","afternoon","evening")
