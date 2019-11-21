@@ -1,4 +1,7 @@
+library(tidyverse)
 
+# Remove carrier
+# test = test[test$OP_CARRIER != "AA",]
 
 add_timeofday_column <- function(df) {
   df$TIME_OF_DAY=cut(df$CRS_DEP_TIME, c(0,600,1200,1800,2400))
@@ -8,19 +11,23 @@ add_timeofday_column <- function(df) {
 
 
 
+
 add_seasonal_data <- function(df)
 {
   date <- as.Date(df$FL_DATE)
-  df$monthnum = as.numeric(as.factor(months(date)))
+  monthnum = months(date)
   
-  df$season = cut(df$monthnum,c(1,4,8,12))
-  levels(df$season) = c("winter","spring","summer","fall")
+  df$SEASON = fct_collapse(monthnum,
+                           winter = c("December", "January", "February"),
+                           spring = c("March", "April", "May"),
+                           summer  = c("June", "July", "August"),
+                           fall = c("September", "October", "November"))
+  
   return(df)
 }
 
-
 add_binomial <- function(df,t)
 {
-  df$ISDELAYED = df$ARR_DELAY > t
+  df$ISDELAYED = as.numeric(df$ARR_DELAY > t)
   return(df)
 }
