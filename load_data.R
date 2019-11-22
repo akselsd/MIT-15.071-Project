@@ -53,7 +53,6 @@ load_data_cancelled <- function(startyear, endyear) {
   df = add_timeofday_column(df)
   df = add_seasonal_data(df)
   df = add_binomial(df, 15)
-  df$WEEKDAY = weekdays(as.Date(df$FL_DATE,'%Y-%m-%d'))
-  df$WEEKDAY <- factor(flight$Weekday)
+  df$WEEKDAY = factor(weekdays(as.Date(df$FL_DATE,'%Y-%m-%d')))
   return(df)
 }
