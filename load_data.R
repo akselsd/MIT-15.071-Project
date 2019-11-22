@@ -51,6 +51,8 @@ load_data_cancelled <- function(startyear, endyear) {
   df$DEP_DELAY[df$DEP_TIME == df$CRS_DEP_TIME] <- 0
   
   df = add_timeofday_column(df)
+  df = add_seasonal_data(df)
+  df = add_binomial(df, 15)
   
   return(df)
 }
