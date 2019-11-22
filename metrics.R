@@ -7,15 +7,20 @@ library(tidyverse)
 ## === Delay types ===
 flight = load_data(2018, 2018)
 
+summary(flight)
+str(flight)
+
+
 #Only flights originating in Boston
 BOS = subset(flight, ORIGIN == "BOS")
 
 #Add Weekday column
 BOS$Weekday = weekdays(as.Date(BOS$FL_DATE,'%Y-%m-%d'))
 
-#Flights by weekday
+#Flights by Weekday
 table(BOS$Weekday)
 
+#Avg delay by Weekday
 avg.weekday.delay = aggregate(BOS$ARR_DELAY, by=list(BOS$Weekday), FUN=mean)
 avg.weekday.delay
 
@@ -24,6 +29,15 @@ days
 
 plot(BOS$Weekday, avg.weekday.delay)
 plot(BOS$Weekday, BOS$ARR_DELAY, xlab = "Weekday", ylab = "Delay Time")
+
+
+
+delays.df <- read.csv("FlightDelays.csv")
+
+barplot(aggregate(delays.df$Flight.Status == "delayed", by = list(delays.df$DAY_WEEK), 
+                  mean, rm.na = T)[,2], xlab = "Day of Week", ylab = "Average Delay", 
+        names.arg = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"))
+
 
 #Delay by Carrier
 DelayByCarrier = aggregate(BOS$ARR_DELAY, by=list(BOS$OP_CARRIER), FUN=mean)
@@ -44,7 +58,9 @@ table(BOS18$OP_CARRIER, BOS18$)
 
 str(BOS18)
 
+# Model Testing
 
+pred
 
 
 
