@@ -10,49 +10,61 @@
 library(testit)
 source("utils.R")
 
-load_data <- function(startyear, endyear) {
-  df = load_data_cancelled(startyear, endyear)
-  df = df[df$CANCELLED == 0,]
-  
-  drops = c("CANCELLED", "CANCELLATION_CODE")
-  
-  df = df[, !(names(df) %in% drops)]
-  
-  assert("No NA in arrival delay column", nrow(df[is.na(df$ARR_DELAY),]) == 0)
-  assert("No NA in departure delay column", nrow(df[is.na(df$DEP_DELAY),]) == 0)
-  assert("No cancelled flights", nrow(df[df$CANCELLED == 1,]) == 0)
-  assert("No diverted flights", nrow(df[df$DIVERTED == 1,]) == 0)
-  
-  return(df)
-}
-
 
 #the function below includes cancelled flights in the data set and zeros them instead of NA
 #and is used in the main function load_data
 
-load_data_cancelled <- function(startyear, endyear) {
+load_data <- function(startyear, endyear) {
   
   assert("Endyear is greater than or equal to startyear", endyear >= startyear)
-  df = data.frame()
+  infile = paste("Data/", toString(startyear), "_boston.csv", sep="")
+  df = read.csv(infile)
   
-  for (year in seq(startyear, endyear)) {
-    infile = paste("Data/", toString(startyear), "_boston.csv", sep="")
+  for (year in seq(startyear + 1, endyear)) {
+    infile = paste("Data/", toString(year), "_boston.csv", sep="")
     data = read.csv(infile)
     df = rbind(df, data)
   }
   
+  
+  
   df = df[df$DIVERTED == 0,]
-  
-  drops = c("DIVERTED", "Unnamed..27", "X")
-  
-  df = df[, !(names(df) %in% drops)]
-  
+  df = df[df$CANCELLED == 0,]
   df$ARR_DELAY[df$ARR_TIME == df$CRS_ARR_TIME] <- 0
   df$DEP_DELAY[df$DEP_TIME == df$CRS_DEP_TIME] <- 0
   
+  drops = c("DIVERTED", "Unnamed..27", "X")
+  df = df[, !(names(df) %in% drops)]
+  
+  df <- subset(df, select = 
+                 c(FL_DATE, OP_CARRIER, OP_CARRIER_FL_NUM, 
+                   CRS_DEP_TIME, CRS_ARR_TIME, CRS_ELAPSED_TIME,
+                   DISTANCE, ORIGIN, DEST, ARR_DELAY))
+  
+  
+  carriers = c("AA", "AS", "B6", "DL", "EV", "UA", "WN")
+  df = df[(df$OP_CARRIER %in% carriers),]
+  df$OP_CARRIER = droplevels(df$OP_CARRIER)
+
+  
+  origins = "ACK|ATL|AUS|BNA|BOS|BUF|BWI|CHS|CLE|CLT|CMH|CVG|DAL|DCA|DEN|DFW|DTW|EWR|FLL|HOU|IAD|IAH|IND|JAX|JFK|LAS|LAX|LGA|LGB|MCI|MCO|MDW|MIA|MKE|MSP|MSY|MVY|OAK|ORD|PBI|PDX|PHL|PHX|PIT|RDU|RIC|RSW|SAN|SAV|SEA|SFO|SJC|SJU|SLC|SMF|SRQ|STL|STT|TPA|SYR"
+  destinations = "ACK|ATL|AUS|BNA|BOS|BUF|BWI|CHS|CLE|CLT|CMH|CVG|DAL|DCA|DEN|DFW|DTW|EWR|FLL|HOU|IAD|IAH|IND|JAX|JFK|LAS|LAX|LGA|LGB|MCI|MCO|MDW|MIA|MKE|MSN|MSP|MSY|MVY|OAK|ORD|ORF|PBI|PDX|PHL|PHX|PIT|RDU|RIC|RSW|SAN|SAV|SEA|SFO|SJC|SJU|SLC|SMF|SRQ|STL|STT|TPA"
+  
+  originvec = unlist(strsplit(origins, "|", fixed=TRUE))
+  destvec = unlist(strsplit(destinations, "|", fixed=TRUE))
+  
+  df = df[(df$DEST %in% destvec),]
+  df$DEST = droplevels(df$DEST)
+  
+  df = df[(df$ORIGIN %in% originvec),]
+  df$ORIGIN = droplevels(df$ORIGIN)
+  
+  
+  
+  
   df = add_timeofday_column(df)
   df = add_seasonal_data(df)
-  df = add_binomial(df, 15)
   df$WEEKDAY = factor(weekdays(as.Date(df$FL_DATE,'%Y-%m-%d')))
+
   return(df)
 }
