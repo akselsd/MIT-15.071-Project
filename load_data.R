@@ -42,8 +42,7 @@ load_data <- function(startyear, endyear) {
   df$MONTH = factor(format(as.POSIXct(df$FL_DATE),"%B"))
   
   df <- subset(df, select = 
-                 c(OP_CARRIER, OP_CARRIER_FL_NUM, 
-                   CRS_DEP_TIME, CRS_ARR_TIME, CRS_ELAPSED_TIME,
+                 c(OP_CARRIER, 
                    DISTANCE, ORIGIN, DEST, ARR_DELAY,
                    TIME_OF_DAY, WEEKDAY, MONTH))
   
