@@ -65,5 +65,13 @@ load_data <- function(startyear, endyear) {
   df = df[(df$ORIGIN %in% originvec),]
   df$ORIGIN = droplevels(df$ORIGIN)
   
+  df$ARRIVING = as.numeric(df$DEST == "BOS")
+  df$AIRPORT = as.factor(
+    ifelse(df$DEST=="BOS", as.character(df$ORIGIN), as.character(df$DEST)))
+  
+
+  drops = c("DEST", "ORIGIN")
+  df = df[, !(names(df) %in% drops)]
+  
   return(df)
 }
