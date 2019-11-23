@@ -36,10 +36,16 @@ load_data <- function(startyear, endyear) {
   drops = c("DIVERTED", "Unnamed..27", "X")
   df = df[, !(names(df) %in% drops)]
   
+  df = add_timeofday_column(df)
+  #df = add_seasonal_data(df)
+  df$WEEKDAY = factor(weekdays(as.Date(df$FL_DATE,'%Y-%m-%d')))
+  df$MONTH = factor(format(as.POSIXct(df$FL_DATE),"%B"))
+  
   df <- subset(df, select = 
-                 c(FL_DATE, OP_CARRIER, OP_CARRIER_FL_NUM, 
+                 c(OP_CARRIER, OP_CARRIER_FL_NUM, 
                    CRS_DEP_TIME, CRS_ARR_TIME, CRS_ELAPSED_TIME,
-                   DISTANCE, ORIGIN, DEST, ARR_DELAY))
+                   DISTANCE, ORIGIN, DEST, ARR_DELAY,
+                   TIME_OF_DAY, WEEKDAY, MONTH))
   
   
   carriers = c("AA", "AS", "B6", "DL", "EV", "UA", "WN")
@@ -59,11 +65,5 @@ load_data <- function(startyear, endyear) {
   df = df[(df$ORIGIN %in% originvec),]
   df$ORIGIN = droplevels(df$ORIGIN)
   
-  
-  df = add_timeofday_column(df)
-  df = add_seasonal_data(df)
-  df$WEEKDAY = factor(weekdays(as.Date(df$FL_DATE,'%Y-%m-%d')))
-  df$MONTH = factor(format(as.POSIXct(df$FL_DATE),"%B"))
-
   return(df)
 }
