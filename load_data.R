@@ -60,11 +60,10 @@ load_data <- function(startyear, endyear) {
   df$ORIGIN = droplevels(df$ORIGIN)
   
   
-  
-  
   df = add_timeofday_column(df)
   df = add_seasonal_data(df)
   df$WEEKDAY = factor(weekdays(as.Date(df$FL_DATE,'%Y-%m-%d')))
+  df$MONTH = factor(format(as.POSIXct(df$FL_DATE),"%B"))
 
   return(df)
 }

@@ -5,53 +5,48 @@ source("load_data.R")
 library(tidyverse)
 
 # load data
-flightTrain <- load_data(2013, 2016)
-flightTest <- load_data(2017, 2017)
+train <- load_data(2009, 2016)
+test <- load_data(2017, 2017)
+str(train)
 
 ##  Linear Regression ############################################
 
-# linear regression model
-flight.lm <- lm(ARR_DELAY ~., data = flightTrain)
-summary(mod1)
+# fit linear regression model
+delay.lm <- lm(ARR_DELAY ~. -FL_DATE, data = train)
+summary(delay.lm)
 
-pred1 <- predict(flight.lm)
+# predict
+pred1 <- predict(delay.lm, newdata = test)
 
+# model performance
+mean_train <- mean(train$ARR_DELAY)
 
-PredictTrain2 = predict(amesTree2, newdata = ames.train)
-PredictTest2 = predict(amesTree2, newdata = ames.test)
+# in-sample
+summary(pred1)
 
-mean_train = mean(ames.train$SalePrice)
-mean_train
-
-SSETrain = sum((PredictTrain2 - ames.train$SalePrice)^2)
-SSTTrain = sum((ames.train$SalePrice - mean_train)^2)
-
-R2 = 1 - SSETrain/SSTTrain
-R2
-
-SSETest = sum((PredictTest2 - ames.test$SalePrice)^2)
-SSTTest = sum((ames.test$SalePrice - mean_train)^2)
-OSR2 = 1 - SSETest/SSTTest
+# out-of-sample
+SSETest <- sum((pred1 - test$ARR_DELAY)^2)
+SSTTest <- sum((test$ARR_DELAY - mean_train)^2)
+OSR2 <- 1 - SSETest/SSTTest
 OSR2
 
-MAE = sum(abs(ames.test$SalePrice-PredictTest2))/nrow(ames.test)
+MAE <- sum(abs(test$ARR_DELAY - pred1))/nrow(test)
 MAE
 
-RMSE = sqrt((sum(ames.test$SalePrice-PredictTest2)^2)/nrow(ames.test))
+RMSE <- sqrt((sum(test$ARR_DELAY - pred1)^2)/nrow(test))
 RMSE
 
-
-
 # stepwise variable selection
-flight.lm.null <- lm(ARR_DELAY~1, data = flightTrain)
+delay.lm.null <- lm(ARR_DELAY~1, data = train)
 
-flight.lm.for <- step(flight.lm.null, scope=list(lower=flight.lm.null, upper=flight.lm), direction = "forward")
+delay.lm.for <- step(delay.lm.null, scope=list(lower=delay.lm.null, upper=delay.lm), direction = "forward")
+summary(delay.lm.for)
 
 flight.lm.back <- step(flight.lm.null, scope=list(lower=flight.lm.null, upper=flight.lm), direction = "backward")
 
-flight.lm.both <- step(flight.lm.null, scope=list(lower=flight.lm.null, upper=flight.lm), direction = "backward")
+flight.lm.both <- step(flight.lm.null, scope=list(lower=flight.lm.null, upper=flight.lm), direction = "both")
 
-pred1 <- predict(flight.lm, data = flightTest)
+pred1 <- predict(flight.lm.for, data = test)
 
 accuracy(flight.lm, flightTest$ARR_DELAY)
 
@@ -65,80 +60,48 @@ accuracy(car.lm.step.pred, valid.df$Price)
 
 ## CART ############################################
 
-# CART
+# load CART libraries
 
 library(rpart) # for building CART model
 library(rpart.plot) # a library for an alternative way of plotting CART trees.
 
-flightTree = rpart(flight ~ ., data=flight_train)
+# build CART model
+
+delayTree1 = rpart(ARR_DELAY ~. -FL_DATE, data = train)
 
 par(mar=c(1,1,1,1))
-prp(claimsTree)
+prp(delayTree)
 
-set.seed(123)
+# performance of initial tree
 
-# Create a user-defined function (returns a 2-element array)
-Loss <- function(data, lev = NULL, model = NULL, ...) {
-  c(AvgLoss = mean(data$weights * (data$obs != data$pred)), Accuracy = mean(data$obs == data$pred))
-}
+CART_train <- predict(delayTree1, newdata = train)
+CART_test <- predict(delayTree1, newdata = test)
 
-# CV on cp vals
-cv.trees = train(Violator~Male+Age+TimeServed+Class+Multiple+InCity,  # *explicitly* enumerate the indep. vars
-                 data=parole.train,
-                 method = "rpart",
-                 weights = ifelse(parole.train$Violator == 1, 20, 1), # loss function
-                 trControl = trainControl(method = "cv", number = 10, summaryFunction=Loss), # 10-fold cv
-                 metric="AvgLoss", maximize=FALSE,                    # minimize the AvgLoss 
-                 tuneGrid = data.frame(.cp = seq(0, .04, by=.002)))   # cp vals: 0, .002, .004, ..., .04; . is part of the syntax
+mean_train <- mean(train$ARR_DELAY)
 
-# PART B: Constructing CART Model  #########################
-
-amesTree1 = rpart(SalePrice ~ ., data=ames.train)
-amesTree1
-
-# To plot the tree, we can use use prp (for "plot rpart")
-par(mar=c(1,1,1,1))
-prp(amesTree1)
-
-tapply(ames, "CentralAir", mean)
-
-mean(ames.train$SalePrice)
-
-NoCA <- subset(ames,CentralAir=="N")
-mean(NoCA$SalePrice)
-YesCA <- subset(ames,CentralAir=="Y")
-mean(YesCA$SalePrice)
-
-
-# Performance of initial Tree  #########################
-
-PredictTrain = predict(amesTree1, newdata = ames.train)
-PredictTest = predict(amesTree1, newdata = ames.test)
-
-mean_train = mean(ames.train$SalePrice)
-mean_train
-
-SSETrain = sum((PredictTrain - ames.train$SalePrice)^2)
-SSTTrain = sum((ames.train$SalePrice - mean_train)^2)
+SSETrain = sum((CART_train - train$ARR_DELAY)^2)
+SSTTrain = sum((train$ARR_DELAY - mean_train)^2)
 
 R2 = 1 - SSETrain/SSTTrain
 R2
 
-SSETest = sum((PredictTest - ames.test$SalePrice)^2)
-SSTTest = sum((ames.test$SalePrice - mean_train)^2)
+SSETest = sum((CART_test - test$ARR_DELAY)^2)
+SSTTest = sum((test$ARR_DELAY - mean_train)^2)
 OSR2 = 1 - SSETest/SSTTest
 OSR2
 
-MAE = sum(abs(ames.test$SalePrice-PredictTest))/nrow(ames.test)
+MAE = sum(abs(test$ARR_DELAY - CART_test))/nrow(test)
 MAE
 
-RMSE = sqrt((sum(ames.test$SalePrice-PredictTest)^2)/nrow(ames.test))
+RMSE = sqrt((sum(test$ARR_DELAY - CART_test)^2)/nrow(test))
 RMSE
 
-# PART D: Cross-Validation  #########################
+# cross-validation
 
-cv.trees = train(SalePrice~.,
-                 data=ames.train,
+set.seed(123)
+
+cv.trees = train(ARR_DELAY~.,
+                 data=train,
                  method = "rpart",
                  trControl = trainControl(method = "cv", number = 10), # 10-fold cv
                  tuneGrid = data.frame(.cp = seq(0,.0004,.00001)))   # cp vals: 0, .002, .004, ..., .04; . is part of the syntax
@@ -148,33 +111,29 @@ cv.trees
 my.best.tree = cv.trees$finalModel
 my.best.tree
 prp(my.best.tree)
-?prp
 
-# PART D: Performance of New Tree  #########################
+# performance of cross validated tree
 
-amesTree2 = rpart(SalePrice ~ ., data=ames.train, cp=0.0006)
+delayTree2 = rpart(ARR_DELAY ~ ., data=ames.train, cp=0.0006)
 
-PredictTrain2 = predict(amesTree2, newdata = ames.train)
-PredictTest2 = predict(amesTree2, newdata = ames.test)
+CART_train2 <- predict(delayTree1, newdata = train)
+CART_test2 <- predict(delayTree1, newdata = test)
 
-mean_train = mean(ames.train$SalePrice)
-mean_train
+mean_train <- mean(train$ARR_DELAY)
 
-SSETrain = sum((PredictTrain2 - ames.train$SalePrice)^2)
-SSTTrain = sum((ames.train$SalePrice - mean_train)^2)
+SSETrain = sum((CART_train2 - train$ARR_DELAY)^2)
+SSTTrain = sum((train$ARR_DELAY - mean_train)^2)
 
 R2 = 1 - SSETrain/SSTTrain
 R2
 
-SSETest = sum((PredictTest2 - ames.test$SalePrice)^2)
-SSTTest = sum((ames.test$SalePrice - mean_train)^2)
+SSETest = sum((CART_test2 - test$ARR_DELAY)^2)
+SSTTest = sum((test$ARR_DELAY - mean_train)^2)
 OSR2 = 1 - SSETest/SSTTest
 OSR2
 
-MAE = sum(abs(ames.test$SalePrice-PredictTest2))/nrow(ames.test)
+MAE = sum(abs(test$ARR_DELAY - CART_test2))/nrow(test)
 MAE
 
-RMSE = sqrt((sum(ames.test$SalePrice-PredictTest2)^2)/nrow(ames.test))
+RMSE = sqrt((sum(test$ARR_DELAY - CART_test2)^2)/nrow(test))
 RMSE
-
-

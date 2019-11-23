@@ -1,12 +1,13 @@
 setwd("~/Desktop/MIT/2019-Fall/15.071/Term Project/Git_Files/MIT-15.071-Project")
 
+# load libraries
 source("load_data.R")
 library(ggplot2)
 library(tidyverse)
 
-## === Delay types ===
-flight_train = load_data(2009, 2015)
-flight_test = load_data(2016, 2018)
+# load data
+train = load_data(2009, 2015)
+test = load_data(2016, 2018)
 
 summary(flight)
 str(flight)
