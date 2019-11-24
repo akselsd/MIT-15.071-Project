@@ -1,8 +1,17 @@
 setwd("~/Desktop/MIT/2019-Fall/15.071/Term Project/Git_Files/MIT-15.071-Project")
 
-# load libraries
+# load source file
 source("load_data.R")
+
+# load libraries
 library(tidyverse)
+library(ROCR)
+library(caret) # for randomly splitting training/test 
+library(rpart) # for building CART model
+library(caTools)
+library(dplyr)
+library(randomForest)
+library(rpart.plot) # a library for an alternative way of plotting CART trees.
 
 # load data
 train <- load_data(2009, 2016)
@@ -59,12 +68,6 @@ car.lm.step.pred <- predict(car.lm.step, valid.df)
 accuracy(car.lm.step.pred, valid.df$Price)
 
 ## CART ############################################
-
-# load CART libraries
-
-library(caret) # for randomly splitting training/test 
-library(rpart) # for building CART model
-library(rpart.plot) # a library for an alternative way of plotting CART trees.
 
 # build CART model
 
