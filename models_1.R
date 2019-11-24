@@ -6,7 +6,7 @@ library(tidyverse)
 
 # load data
 train <- load_data(2009, 2016)
-test <- load_data(2017, 2017)
+test <- load_data(2017, 2018)
 str(train)
 
 ##  Linear Regression ############################################
@@ -68,7 +68,7 @@ library(rpart.plot) # a library for an alternative way of plotting CART trees.
 
 # build CART model
 
-delayTree1 = rpart(ARR_DELAY ~., data = train)
+delayTree1 = rpart(ARR_DELAY ~., data = train, cp=0.00001)
 
 par(mar=c(1,1,1,1))
 prp(delayTree1)
@@ -105,7 +105,7 @@ cv.trees = train(ARR_DELAY~.,
                  data=train,
                  method = "rpart",
                  trControl = trainControl(method = "cv", number = 10), # 10-fold cv
-                 tuneGrid = data.frame(.cp = seq(0,.0004,.00001)))   # cp vals: 0, .002, .004, ..., .04; . is part of the syntax
+                 tuneGrid = data.frame(.cp = seq(0,1e-04,1e-06)))   # cp vals: 0, .002, .004, ..., .04; . is part of the syntax
 
 cv.trees
 
@@ -115,10 +115,10 @@ prp(my.best.tree)
 
 # performance of cross validated tree
 
-delayTree2 = rpart(ARR_DELAY ~ ., data=ames.train, cp=0.0006)
+delayTree2 = rpart(ARR_DELAY ~ ., data=train, cp=1e-05)
 
-CART_train2 <- predict(delayTree1, newdata = train)
-CART_test2 <- predict(delayTree1, newdata = test)
+CART_train2 <- predict(delayTree2, newdata = train)
+CART_test2 <- predict(delayTree2, newdata = test)
 
 mean_train <- mean(train$ARR_DELAY)
 
