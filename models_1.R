@@ -30,9 +30,6 @@ pred1 <- predict(delay.lm, newdata = test)
 # model performance
 mean_train <- mean(train$ARR_DELAY)
 
-# in-sample
-summary(pred1)
-
 # out-of-sample
 SSETest <- sum((pred1 - test$ARR_DELAY)^2)
 SSTTest <- sum((test$ARR_DELAY - mean_train)^2)
@@ -51,27 +48,30 @@ delay.lm.null <- lm(ARR_DELAY~1, data = train)
 delay.lm.for <- step(delay.lm.null, scope=list(lower=delay.lm.null, upper=delay.lm), direction = "forward")
 summary(delay.lm.for)
 
-flight.lm.back <- step(flight.lm.null, scope=list(lower=flight.lm.null, upper=flight.lm), direction = "backward")
+delay.lm.back <- step(delay.lm.null, scope=list(lower=delay.lm.null, upper=delay.lm), direction = "backward")
 
-flight.lm.both <- step(flight.lm.null, scope=list(lower=flight.lm.null, upper=flight.lm), direction = "both")
+delay.lm.both <- step(delay.lm.null, scope=list(lower=delay.lm.null, upper=delay.lm), direction = "both")
 
-pred1 <- predict(flight.lm.for, data = test)
+pred1 <- predict(delay.lm.for, data = test)
+summary(pred1)
 
-accuracy(flight.lm, flightTest$ARR_DELAY)
+# out-of-sample
+SSETest <- sum((pred1 - test$ARR_DELAY)^2)
+SSTTest <- sum((test$ARR_DELAY - mean_train)^2)
+OSR2 <- 1 - SSETest/SSTTest
+OSR2
 
+MAE <- sum(abs(test$ARR_DELAY - pred1))/nrow(test)
+MAE
 
-# use step() to run stepwise regression.
-# set directions =  to either "backward", "forward", or "both".
-car.lm.step <- step(car.lm, direction = "backward")
-summary(car.lm.step)  # Which variables did it drop?
-car.lm.step.pred <- predict(car.lm.step, valid.df)
-accuracy(car.lm.step.pred, valid.df$Price)
+RMSE <- sqrt((sum(test$ARR_DELAY - pred1)^2)/nrow(test))
+RMSE
 
 ## CART ############################################
 
 # build CART model
 
-delayTree1 = rpart(ARR_DELAY ~., data = train, cp=0.00001)
+delayTree1 = rpart(ARR_DELAY ~., data = train, cp=1.5e-05)
 
 par(mar=c(1,1,1,1))
 prp(delayTree1)
@@ -118,7 +118,7 @@ prp(my.best.tree)
 
 # performance of cross validated tree
 
-delayTree2 = rpart(ARR_DELAY ~ ., data=train, cp=1e-05)
+delayTree2 = rpart(ARR_DELAY ~ ., data=train, cp=1.5e-05)
 
 CART_train2 <- predict(delayTree2, newdata = train)
 CART_test2 <- predict(delayTree2, newdata = test)
