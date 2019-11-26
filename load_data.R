@@ -36,8 +36,12 @@ load_data <- function(startyear, endyear) {
   drops = c("DIVERTED", "Unnamed..27", "X")
   df = df[, !(names(df) %in% drops)]
   
-  df = add_timeofday_column(df)
+  #df = add_timeofday_column(df)
+  
+  df = add_hours_column(df)
+  #by hour of day, bins of 1 hour
   #df = add_seasonal_data(df)
+  
   df$WEEKDAY = factor(weekdays(as.Date(df$FL_DATE,'%Y-%m-%d')))
   df$MONTH = factor(format(as.POSIXct(df$FL_DATE),"%B"))
   
