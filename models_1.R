@@ -48,23 +48,24 @@ delay.lm.null <- lm(ARR_DELAY~1, data = train)
 delay.lm.for <- step(delay.lm.null, scope=list(lower=delay.lm.null, upper=delay.lm), direction = "forward")
 summary(delay.lm.for)
 
-delay.lm.back <- step(delay.lm.null, scope=list(lower=delay.lm.null, upper=delay.lm), direction = "backward")
+delay.lm.back <- step(delay.lm, scope=list(lower=delay.lm.null, upper=delay.lm), direction = "backward")
+summary(delay.lm.back)
 
-delay.lm.both <- step(delay.lm.null, scope=list(lower=delay.lm.null, upper=delay.lm), direction = "both")
+delay.lm.both <- step(delay.lm, scope=list(lower=delay.lm.null, upper=delay.lm), direction = "both")
 
-pred1 <- predict(delay.lm.for, data = test)
-summary(pred1)
+# stepwise prediction
+pred2 <- predict(delay.lm.back, newdata = test)
 
-# out-of-sample
-SSETest <- sum((pred1 - test$ARR_DELAY)^2)
+# stepwise performance
+SSETest <- sum((pred2 - test$ARR_DELAY)^2)
 SSTTest <- sum((test$ARR_DELAY - mean_train)^2)
 OSR2 <- 1 - SSETest/SSTTest
 OSR2
 
-MAE <- sum(abs(test$ARR_DELAY - pred1))/nrow(test)
+MAE <- sum(abs(test$ARR_DELAY - pred2))/nrow(test)
 MAE
 
-RMSE <- sqrt((sum(test$ARR_DELAY - pred1)^2)/nrow(test))
+RMSE <- sqrt((sum(test$ARR_DELAY - pred2)^2)/nrow(test))
 RMSE
 
 ## CART ############################################
