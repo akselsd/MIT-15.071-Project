@@ -24,6 +24,9 @@ load_aggregate <- function(startyear, endyear) {
   dfdist = aggregate(DISTANCE ~ dateHour + TIME_OF_DAY + MONTH + OP_CARRIER + WEEKDAY, df, mean)
   dfdist$ARR_DELAY = dfarr$ARR_DELAY
   
+  drops = c("dateHour")
+  dfdist = dfdist[, !(names(dfdist) %in% drops)]
+  
   return(dfdist)
   
   
@@ -88,7 +91,7 @@ load_data <- function(startyear, endyear) {
     ifelse(df$DEST=="BOS", as.character(df$ORIGIN), as.character(df$DEST)))
   
 
-  drops = c("DEST", "ORIGIN")
+  drops = c("DEST", "ORIGIN", "dateHour")
   df = df[, !(names(df) %in% drops)]
   
   return(df)

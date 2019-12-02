@@ -14,8 +14,8 @@ library(randomForest)
 library(rpart.plot) # a library for an alternative way of plotting CART trees.
 
 # load data
-train <- load_data(2009, 2016)
-test <- load_data(2017, 2018)
+train <- load_aggregate(2009, 2016)
+test <- load_aggregate(2017, 2018)
 str(train)
 
 ##  Linear Regression ############################################
