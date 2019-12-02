@@ -14,6 +14,21 @@ source("utils.R")
 #the function below includes cancelled flights in the data set and zeros them instead of NA
 #and is used in the main function load_data
 
+load_aggregate <- function(startyear, endyear) {
+  df = load_data(startyear, endyear)
+  
+  df$dateHour = cut(as.POSIXct(paste(df$FL_DATE, df$TIME_OF_DAY),
+                               format="%Y-%m-%d %H"), breaks="hour")
+  
+  dfarr = aggregate(ARR_DELAY ~ dateHour + TIME_OF_DAY + MONTH + OP_CARRIER + WEEKDAY, df, mean)
+  dfdist = aggregate(DISTANCE ~ dateHour + TIME_OF_DAY + MONTH + OP_CARRIER + WEEKDAY, df, mean)
+  dfdist$ARR_DELAY = dfarr$ARR_DELAY
+  
+  return(dfdist)
+  
+  
+}
+
 load_data <- function(startyear, endyear) {
   
   assert("Endyear is greater than or equal to startyear", endyear >= startyear)
@@ -46,7 +61,7 @@ load_data <- function(startyear, endyear) {
   df$MONTH = factor(format(as.POSIXct(df$FL_DATE),"%B"))
   
   df <- subset(df, select = 
-                 c(OP_CARRIER, 
+                 c(OP_CARRIER, FL_DATE,
                    DISTANCE, ORIGIN, DEST, ARR_DELAY,
                    TIME_OF_DAY, WEEKDAY, MONTH))
   
