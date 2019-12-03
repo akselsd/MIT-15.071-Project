@@ -16,6 +16,7 @@ source("utils.R")
 
 load_aggregate <- function(startyear, endyear) {
   df = load_data(startyear, endyear)
+  df = df[df$ARR_DELAY < 240,]
   
   df$dateHour = cut(as.POSIXct(paste(df$FL_DATE, df$TIME_OF_DAY),
                                format="%Y-%m-%d %H"), breaks="hour")
